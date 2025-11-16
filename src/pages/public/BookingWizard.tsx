@@ -8,10 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarScheduler } from '@/components/ui/calendar-scheduler';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -296,6 +295,7 @@ export default function BookingWizard() {
     return dateAvailability.get(dateStr);
   };
 
+  const getDateStatus = (date: Date) => {
     const avail = getDateAvailability(date);
     if (!avail) return 'loading';
     if (avail.remaining === 0) return 'full';
@@ -330,48 +330,6 @@ export default function BookingWizard() {
           <p className="text-gray-600">Simple, rapide et sans surprises</p>
         </div>
 
-        {/* Dentist Hero - show before the steps to make it personal */}
-        <div className="mb-6">
-          <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <Avatar className="h-24 w-24 md:h-32 md:w-32 ring-2 ring-blue-50">
-                <AvatarImage src={dentist.photo} alt={dentist.name} />
-                <AvatarFallback>{dentist.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">{dentist.name}</h2>
-                    <p className="text-sm text-gray-600">{dentist.specialty} · {dentist.city}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                <Badge className="bg-green-50 text-green-700">{dentist.reviews?.length ?? 0} avis</Badge>
-                    <Badge className="bg-blue-50 text-blue-700">Cabinet moderne</Badge>
-                  </div>
-                </div>
-                {dentist.bio && <p className="mt-3 text-sm text-gray-700">{dentist.bio}</p>}
-                <div className="mt-3 flex items-center gap-3">
-                  <a href={`tel:${dentist.phone}`} className="text-sm text-blue-600 font-semibold">Appeler · {dentist.phone}</a>
-                  {dentist.email && <a href={`mailto:${dentist.email}`} className="text-sm text-gray-500">{dentist.email}</a>}
-                </div>
-              </div>
-            </div>
-
-            {/* Reviews preview */}
-            {dentist.reviews && dentist.reviews.length > 0 && (
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {dentist.reviews.slice(0, 3).map((r) => (
-                  <div key={r.id} className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-sm text-gray-800 font-medium">{r.comment}</div>
-                    <div className="mt-2 text-xs text-gray-500">— {r.name}, {format(new Date(r.date), 'dd MMM yyyy', { locale: fr })}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Stepper & Summary */}
           <div className="lg:col-span-1 space-y-6">
@@ -383,7 +341,7 @@ export default function BookingWizard() {
               <CardContent className="space-y-6">
                 {/* Steps */}
                 <div className="space-y-4">
-                  {STEPS.map((step) => {
+                  {STEPS.map((step, index) => {
                     const isCompleted = completedSteps >= step.id;
                     const isCurrent = currentStep === step.id;
                     const Icon = step.icon;
