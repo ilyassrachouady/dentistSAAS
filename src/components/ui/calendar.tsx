@@ -176,11 +176,27 @@ function Calendar({
           },
           components: mergedComponents,
           disabled: mergedDisabled as any,
+          modifiers: {
+            saturday: (date: Date) => date.getDay() === 6,
+            sunday: (date: Date) => date.getDay() === 0,
+          },
+          modifiersClassNames: {
+            saturday: 'saturday-styling',
+            sunday: 'sunday-styling',
+          },
         };
 
         return <DayPicker {...propsToPass} />;
       })()}
       <style>{`
+        .saturday-styling:not([data-disabled="true"]) {
+          background-color: #eff6ff; /* blue-50 */
+          color: #2563eb; /* blue-600 */
+          font-weight: 600;
+        }
+        .sunday-styling {
+          color: #9ca3af !important; /* gray-400 */
+        }
         .rdp-month {
           width: 100%;
         }

@@ -31,6 +31,7 @@ import {
   ChevronRight,
   MessageCircle,
   Download,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -163,8 +164,22 @@ export default function BookingWizard() {
         return;
       }
       
-      // Generate time slots with mock capacity
-      const timeSlots: TimeSlot[] = slots.map(time => {
+      // Filter slots for weekends and generate mock capacity
+      const day = selectedDate.getDay();
+
+      const filteredSlots = slots.filter(time => {
+        // Sunday (0) is disabled
+        if (day === 0) return false;
+        // Saturday (6) is morning only
+        if (day === 6) {
+          const hour = parseInt(time.split(':')[0]);
+          return hour < 12;
+        }
+        // Other days are fully available
+        return true;
+      });
+
+      const timeSlots: TimeSlot[] = filteredSlots.map(time => {
         const capacity = Math.floor(Math.random() * 4) + 3; // 3-6 capacity
         const remaining = Math.floor(Math.random() * capacity) + 1; // At least 1 remaining
         return {
@@ -273,20 +288,52 @@ export default function BookingWizard() {
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-            <Sparkles className="w-8 h-8 text-white" />
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl mb-4">
+            <Sparkles className="w-8 h-8" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Réserver un rendez-vous</h1>
           <p className="text-gray-600">Simple, rapide et sans surprises</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Stepper & Summary */}
-          <div className="lg:col-span-1 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Left: Dentist Info & Summary */}
+          <div className="md:col-span-1 space-y-8">
+            {/* Dentist Info Card */}
+            <Card className="shadow-lg border-gray-200 rounded-2xl overflow-hidden">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center">
+                <img
+                  src={dentist.photo}
+                  alt={dentist.name}
+                  className="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-lg"
+                />
+                <h2 className="text-xl font-bold text-white mt-4">{dentist.name}</h2>
+                <p className="text-sm text-blue-200">{dentist.specialty}</p>
+              </div>
+              <CardContent className="p-6 space-y-3 bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Avis</span>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${
+                          i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                    <span className="font-semibold ml-2">4.8 (24 avis)</span>
+                  </div>
+                </div>
+                <Button variant="outline" className="w-full">
+                  Voir le profil complet
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Stepper */}
             <Card className="shadow-lg border-0 sticky top-4">
               <CardHeader>
@@ -361,9 +408,9 @@ export default function BookingWizard() {
           </div>
 
           {/* Right: Active Step Content */}
-          <div className="lg:col-span-2">
-            <Card className="shadow-lg border-0 min-h-[600px]">
-              <CardContent className="p-6">
+          <div className="md:col-span-2">
+            <Card className="shadow-lg border-gray-200 rounded-2xl min-h-[600px]">
+              <CardContent className="p-8">
                 {/* Step 1: Service Selection */}
                 {currentStep === 1 && (
                   <div className="space-y-6">
@@ -419,7 +466,11 @@ export default function BookingWizard() {
                     <div className="w-full">
                       <CalendarScheduler
                         timeSlots={availableSlots.length > 0 ? availableSlots.map(s => formatTime12h(s.time)) : []}
-                        disabledDates={(date) => date < new Date()}
+                        disabledDates={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today || date.getDay() === 0; // Disable past dates and Sundays
+                        }}
                         onDateChange={(date) => {
                           handleDateSelect(date);
                         }}
