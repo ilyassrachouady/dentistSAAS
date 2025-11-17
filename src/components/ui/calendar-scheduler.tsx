@@ -17,21 +17,28 @@ export interface CalendarSchedulerProps {
 
 // Helper to generate consistent random availability for a date
 const getDateAvailability = (date: Date): boolean => {
-  const dateStr = date.toISOString().split('T')[0];
-  const hash = dateStr.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return hash % 5 !== 0; // ~80% available, ~20% fully booked
+  // Make the 15th and 28th of any month fully booked
+  if ([15, 28].includes(date.getDate())) {
+    return false;
+  }
+  return true; // All other days are available
 };
 
 // Helper to generate consistent random availability for a time slot
 const getTimeSlotAvailability = (date: Date, time: string): boolean => {
-  const dateStr = date.toISOString().split('T')[0];
   // First check if the entire day is unavailable
   if (!getDateAvailability(date)) {
-    return false; // Entire day is unavailable
+    return false;
   }
-  const combined = `${dateStr}-${time}`;
-  const hash = combined.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return hash % 2 === 0;
+  // Make 10:00 and 11:00 on the 20th unavailable
+  if (date.getDate() === 20 && ["10:00", "11:00"].includes(time)) {
+    return false;
+  }
+  // Make morning slots on the 22nd unavailable
+  if (date.getDate() === 22 && parseInt(time.split(':')[0]) < 12) {
+    return false;
+  }
+  return true; // All other slots are available
 };
 
 // Helper to check if any time slot is available on a given date
