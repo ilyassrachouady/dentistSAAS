@@ -31,7 +31,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Calendar } from '@/components/ui/calendar';
-import { AddAppointmentForm } from '@/components/AddAppointmentForm';
+import BookingWizard from '@/pages/public/BookingWizard';
 import { toast } from 'sonner';
 import { Plus, Calendar as CalendarIcon, Clock, Filter, List, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -165,13 +165,14 @@ export default function AppointmentsPage() {
                 Créez un nouveau rendez-vous pour un patient
               </DialogDescription>
             </DialogHeader>
-            <AddAppointmentForm
-              dentistId={dentist?.id || ''}
-              onSuccess={() => {
-                setShowAddDialog(false);
-                loadAppointments();
-              }}
-            />
+            <div className="w-full">
+              <BookingWizard
+                onComplete={() => {
+                  setShowAddDialog(false);
+                  loadAppointments();
+                }}
+              />
+            </div>
           </DialogContent>
         </Dialog>
       </div>

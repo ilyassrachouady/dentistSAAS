@@ -30,7 +30,7 @@ import {
   Users,
   Plus,
 } from 'lucide-react';
-import { AddAppointmentForm } from '@/components/AddAppointmentForm';
+import NewAppointmentForm from '@/components/NewAppointmentForm';
 
 export default function DashboardHome() {
   const { dentist } = useAuth();
@@ -113,13 +113,15 @@ export default function DashboardHome() {
                 Créez un nouveau rendez-vous pour un patient
               </DialogDescription>
             </DialogHeader>
-            <AddAppointmentForm
-              dentistId={dentist?.id || ''}
-              onSuccess={() => {
-                setShowAddDialog(false);
-                loadAppointments();
-              }}
-            />
+            <div className="w-full">
+              <NewAppointmentForm
+                dentistId={dentist?.id || ''}
+                onSuccess={() => {
+                  setShowAddDialog(false);
+                  loadAppointments();
+                }}
+              />
+            </div>
           </DialogContent>
         </Dialog>
       </div>
