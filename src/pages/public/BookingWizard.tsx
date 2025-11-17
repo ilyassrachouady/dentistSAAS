@@ -246,6 +246,9 @@ export default function BookingWizard({ onComplete }: { onComplete?: () => void 
       setShowSuccess(true);
       setCurrentStep(5);
       toast.success('Rendez-vous confirmé! Un message a été envoyé à ' + booking.patientPhone);
+      if (onComplete) {
+        onComplete();
+      }
     } catch (error) {
       toast.error('Erreur lors de la réservation');
     } finally {
