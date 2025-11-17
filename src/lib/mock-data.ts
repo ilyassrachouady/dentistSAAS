@@ -246,8 +246,13 @@ export const getAvailableTimeSlots = (date: Date, dentist: Dentist, existingAppo
   // Filter out booked slots
   const bookedSlots = existingAppointments
     .filter(apt => {
-      const aptDate = new Date(apt.date).toISOString().split('T')[0];
-      return aptDate === dateStr && apt.status !== 'cancelled';
+      const aptDate = new Date(apt.date);
+      return (
+        aptDate.getFullYear() === date.getFullYear() &&
+        aptDate.getMonth() === date.getMonth() &&
+        aptDate.getDate() === date.getDate() &&
+        apt.status !== 'cancelled'
+      );
     })
     .map(apt => apt.time);
   
